@@ -58,9 +58,11 @@ class DesktopNotifierSync:
             print(f"Created asyncio.Task in currently running event loop: {task}")
 
             # Can't actually wait for the task to finish here. Something like
+            #
             #    while not task.done():
             #        sleep(SLEEP_INTERVAL_SECONDS)
-            # Never finishes because the event loop is never given control to run the task.
+            #
+            # never finishes bc the event loop is never given control to launch the task.
             res = None
         else:
             res = self._get_event_loop().run_until_complete(coro)
