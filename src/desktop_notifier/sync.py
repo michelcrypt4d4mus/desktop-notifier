@@ -3,11 +3,12 @@
 Synchronous desktop notification API
 """
 
+import logging
 from __future__ import annotations
 
 # system imports
 import asyncio
-from typing import Callable, Coroutine, Any, Sequence, TypeVar, List
+from typing import Any, Callable, Coroutine, List, Optional, Sequence, TypeVar
 
 # local imports
 from .main import DesktopNotifier
@@ -25,6 +26,7 @@ from .base import (
 
 __all__ = ["DesktopNotifierSync"]
 
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -45,7 +47,7 @@ class DesktopNotifierSync:
         notification_limit: int | None = None,
     ) -> None:
         self._async_api = DesktopNotifier(app_name, app_icon, notification_limit)
-        self._event_loop = None
+        self._event_loop: Optional[asyncio.AbstractEventLoop] = None
 
     def _run_coro_sync(self, coro: Coroutine[None, None, T]) -> T:
         # Make sure to always use the same loop because async queues, future, etc. are
@@ -149,9 +151,9 @@ class DesktopNotifierSync:
         if self._event_loop is None:
             try:
                 self._event_loop = asyncio.get_running_loop()
-                print("Found running event loop, using it.")
+                logger.debug("Found running event loop, using it.")
             except RuntimeError:
-                print("No running event loop found, creating a new one.")
+                logger.debug("No running event loop found, creating a new one.")
                 self._event_loop = asyncio.new_event_loop()
 
         return self._event_loop
